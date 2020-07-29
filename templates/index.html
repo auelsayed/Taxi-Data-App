@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+
+{% block head %}
+
+{% endblock%}
+
+{% block body %}
+<div id="vis"></div>
+
+<div class="card" id = "info-card" style ="position: absolute;right: 3%;top: 15%;width: 29%;height: 65vh; background-color: #e6e6e6;">
+    <h5 class="card-title" style = "padding: 4%; background-color: #2CA5DD; text-align: center; font-size:x-large;"></h5>
+    <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          2019
+        </button>
+                <ul class="dropdown-menu dropdown-menu-select">
+                <li><label class="dropdown-radio">
+                    <input type="radio" value="2017" name="alphabet">
+                    <i>2017</i>
+                    </label>
+                </li>
+                <li><label class="dropdown-radio">
+                    <input type="radio" value="2018" name="alphabet">
+                    <i>2018</i>
+                    </label>
+                </li>
+                <li><label class="dropdown-radio">
+                    <input type="radio" value="2019" name="alphabet" checked>
+                    <i>2019</i>
+                    </label>
+                </li>
+                </ul>
+      </div>
+    <svg id = "card-svg" width = "100%" height = "70%"></svg>
+    <div id = "left_half" class="border border-dark" style = "position: absolute; top:76%; left:0%; width: 50%; height: 24%; padding: 2%; text-align: center;"> 
+        <p class="card-text" id = "pickup">Rides beginning here</p>
+        <br>
+        <p class="card-text" id = "pickup_num" style = "text-align: center; font-size:x-large;"></p>
+    </div>
+    <div id = "right_half" class="border border-dark" style = "position: absolute; top:76%; left:50%; width: 50%; height: 24%; padding: 2%; text-align: center;"> 
+        <p class="card-text" id = "dropoff">Rides ending here</p>
+        <br>
+        <p class="card-text" id = "dropoff_num" style = "text-align: center; font-size:x-large;"></p>
+    </div>
+</div>
+
+
+<div id = "legend" class = "card border border-dark" style = "position: absolute; width:25%;"> 
+    <div id = "row1" style = "padding:1%;"> 
+        <svg style = "height: 20px;width: 10%;overflow:visible; fill: #feb24c;float: left; ">
+            <circle cx = "14" cy = "14" r = "8"></circle>
+        </svg>
+
+        <p class="card-text" id = "orange">Dropoff areas of rides originating at selected area</p>
+
+    </div>
+    <div id = "row2" style = "padding:1%;"> 
+        <svg style = "height: 20px; width: 10%; overflow:visible; fill: #f03b20;float: left;">
+            <circle cx = "14" cy = "14" r = "8"></circle>
+        </svg>
+
+        <p class="card-text" id = "red">Pickup areas of rides ending at selected area</p>
+
+    </div>
+    <div id = "row3" style = "padding:1%;"> 
+        <svg style = "height: 20px;width: 10%; overflow:visible; fill: #addd8e;float: left;">
+            <circle cx = "14" cy = "14" r = "8"></circle>
+        </svg>
+
+        <p class="card-text" id = "green">Areas that are both pickup and dropoff locations for selected area</p>
+
+    </div>
+
+    </div>
+
+</div>
+
+
+<script>
+    var width = window.innerWidth * .7;
+    var height = window.innerHeight * .98;
+
+    var card = d3.select("#info-card");
+    var year = +d3.select("#dropdownMenuButton").text();
+
+    var tooltip = d3.select('body')
+    .style('background-color', '#ceeaf7')
+    .append('div')
+    .attr('id', 'tooltip');
+
+    d3.select(".card-body").append("svg").attr('id', 'card-svg');
+    var vis = d3.select("#vis").append("svg")
+    .attr('id', 'mainSvg')
+    .attr("width", width).attr("height", height)
+    .style("pointer-events", "fill")
+
+    // Map drawing by d3 and GEOJSON from NYC public database
+    var projection = d3.geoMercator().scale(1).translate([0,0]).precision(0);
+    var path = d3.geoPath().projection(projection);
+
+    projection.fitSize([width, height], {{data | safe}})
+
+    var paths = vis.selectAll("path").data({{data.features | safe}}, d => {return d.properties.location_id}).enter().append("path")
+        .attr("d", path)
+        .attr("id", d => {return "zone-" + d.properties.location_id; })
+        .classed("region", true)
+
+    // Interactivity setup for regions
+    d3.selectAll("path")
+    .on("mouseover", function (d) {
+        var curr_path = d3.select(this);
+        curr_path.classed("focused_region", true)
+
+        d3.select('#tooltip').style('display', "inline").text(d.properties.zone);
+    })
+    .on("mouseleave", function (d) {
+        d3.select('#tooltip').style('display', "none");
+        d3.select(this).classed("focused_region", false );
+    })
+    .on('mousemove', function() {
+        d3.select('#tooltip')
+        .style('left', (d3.event.pageX+15) + 'px')
+        .style('top', (d3.event.pageY+15) + 'px')
+    })
+    .on("click", function (d) {
+        var elt = d3.select(".focused_region_active")
+        if(elt.empty()){
+            d3.select(this).classed("focused_region_active", true)
+        }
+        else{
+            elt.classed("focused_region_active", false)
+            d3.select(this).classed("focused_region_active", true)
+
+        }
+        // GET request for region-specific info
+        fetch(document.URL + d.properties.location_id + '/' + year)
+            .then(function (response) {
+                return response.json();
+            }).then(function (text) {
+                console.log(year)
+
+                // Reset all pickup and dropoff zones, and stat buttons
+                d3.selectAll(".pickup_zones").classed("pickup_zones", false)
+                d3.selectAll(".dropoff_zones").classed("dropoff_zones", false)
+                d3.selectAll(".pickup_zones_active").classed("pickup_zones_active", false)
+                d3.selectAll(".dropoff_zones_active").classed("dropoff_zones_active", false)
+                d3.select(".left_half_active").classed("left_half_active", false)
+                d3.select(".right_half_active").classed("right_half_active", false)
+
+                // Designate zones as pickup zones for future editing
+                text.pickup_zones.forEach(element => {
+                    d3.select("#zone-" + element[0]).classed("pickup_zones", true)
+                });
+
+                // Designate zones as dropoff zones for future editing
+                text.dropoff_zones.forEach(element => {
+                    d3.select("#zone-" + element[0]).classed("dropoff_zones", true)
+                });
+                // Update stats of rides with numbers that have commas in appropriate locations (thousands spots)
+                var card = d3.select("#info-card");
+                card.select("#pickup_num").text((text.pickup).toLocaleString('en'))
+                card.select("#dropoff_num").text((text.dropoff).toLocaleString('en'))
+            });
+        
+        // Make info card visible after clicking on any region
+        var card_svg = d3.select("#card-svg");
+        card.style("display", "inline")
+
+        d3.select("#legend").style("display", "flex")
+
+        var curr_path = d3.select(this);
+
+        // Update info card title as name of region
+        card.select("h5").text(d.properties.zone)
+
+        // Reset the svg in info card such that there is only one path
+        card_svg.selectAll("*").remove();
+        card_svg.append('g').attr('id', 'group')
+        card_svg = card_svg.select('g')
+        card_svg.node().append(curr_path.node().cloneNode());
+
+        var cloned_node = card_svg.select("path");
+        cloned_node.style("fill", '#FFF2AF').style("transform", "scale(2)")
+
+        var node_bbox = card_svg.node().getBBox();
+        var card_node = card.node()
+        // Translate to (0,0) of svg (after scaling by 2), then translate to center (horizontally) of the card (parent div)
+        card_svg.attr("transform", `translate(${-node_bbox.x}, ${-node_bbox.y }) translate(${(card_node.offsetWidth/2) - (node_bbox.width / 2)}, ${card_node.offsetHeight * 0.1})`);
+
+    });
+
+    d3.select("#left_half").on("mouseover", function(d) {
+        d3.select(this).classed("left_half_hover", true)
+        d3.selectAll(".pickup_zones").classed("pickup_zones_hover", true)})
+     .on("mouseleave", function(d) {
+        d3.select(this).classed("left_half_hover", false)
+        d3.selectAll(".pickup_zones").classed("pickup_zones_hover", false)
+     })
+
+    .on("click", function(d) {
+        var box = d3.select(this)
+        if(!box.classed("left_half_active")){
+            box.classed("left_half_active", true)
+        }
+        else{
+            box.classed("left_half_active", false)
+        }
+
+        var zones = d3.selectAll(".pickup_zones")
+        if(zones.empty() || !zones.classed("pickup_zones_active")){
+            zones.classed("pickup_zones_active", true)
+        }
+        else{
+            zones.classed("pickup_zones_active", false)
+        }    
+    });
+    d3.select("#right_half")
+    .on("mouseover", function(d) {
+        d3.select(this).classed("right_half_hover", true)
+        d3.selectAll(".dropoff_zones").classed("dropoff_zones_hover", true)
+    }) 
+    .on("mouseleave", function(d) {
+        d3.select(this).classed("right_half_hover", false)
+        d3.selectAll(".dropoff_zones").classed("dropoff_zones_hover", false)
+    })
+    .on("click", function(d) {
+        var box = d3.select(this)
+        if(!box.classed("right_half_active")){
+            box.classed("right_half_active", true)
+        }
+        else{
+            box.classed("right_half_active", false)
+        }
+
+        var zones = d3.selectAll(".dropoff_zones")
+        if(zones.empty() || !zones.classed("dropoff_zones_active")){
+            zones.classed("dropoff_zones_active", true)
+        }
+        else{
+            zones.classed("dropoff_zones_active", false)
+        }    
+    });
+
+    d3.selectAll("input").on("change", function(){
+        var toggle = d3.select("#dropdownMenuButton")
+        toggle.text(this.value)
+        year = +this.value;
+        document.getElementsByClassName("focused_region_active")[0].dispatchEvent(new Event("click"))
+    });
+
+</script>
+
+{% endblock %}

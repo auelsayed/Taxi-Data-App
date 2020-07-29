@@ -1,0 +1,84 @@
+#tooltip {
+    background: #828a95;
+    box-shadow: 0 0 5px #999999;
+    color: #333;
+    display: none;
+    font-size: calc(14px + (22 - 14) * ((100vw - 300px) / (1600 - 300)));
+    left: 130px;
+    padding: 0.2%;
+    position: absolute;
+    text-align: center;
+    top: 95px;
+    width: auto;
+    z-index: 10;
+}
+
+#info-card {
+    position: fixed;
+    top: 20%;
+    right: 20%;
+    display: none;
+    font-size: large;
+    font-family: 'taxidriverregular';
+}
+
+#legend {
+    position: fixed;
+    top: 10%;
+    left: 5%;
+    display: none;
+    background-color: #e6e6e6;
+    border: none;
+}
+
+.region {
+    fill: #FFF2AF;
+    stroke: black;
+    transition: fill 250ms;
+}
+
+.left_half_hover,
+.right_half_hover {
+    cursor: pointer;
+    background-color: #999169;
+    transition: background-color 150ms;
+}
+
+.left_half_active,
+.right_half_active {
+    background-color: #999169;
+}
+
+.pickup_zones,
+.dropoff_zones {
+    fill: #FFF2AF;
+    stroke: black;
+
+}
+
+.focused_region,
+.focused_region_active {
+    fill: #999169;
+    transition: fill 350ms;
+    cursor: pointer;
+}
+
+
+.pickup_zones_active,
+.pickup_zones_hover {
+    fill: #feb24c;
+    transition: fill 350ms;
+}
+
+.dropoff_zones_active,
+.dropoff_zones_hover {
+    fill: #f03b20;
+    transition: fill 350ms;
+}
+
+.pickup_zones_active.dropoff_zones_active,
+.pickup_zones_active.dropoff_zones_hover,
+.pickup_zones_hover.dropoff_zones_active,
+.pickup_zones_hover.dropoff_zones_hover {
+    fill: #addd8e;
+}
