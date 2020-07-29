@@ -13,8 +13,8 @@
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           2019
         </button>
-                <ul class="dropdown-menu dropdown-menu-select">
-                <li><label class="dropdown-radio">
+                <ul class="dropdown-menu dropdown-menu-select" style = "large">
+                <li><label class="dropdown-radio" >
                     <input type="radio" value="2017" name="alphabet">
                     <i>2017</i>
                     </label>
@@ -181,6 +181,8 @@
 
         var cloned_node = card_svg.select("path");
         cloned_node.style("fill", '#FFF2AF').style("transform", "scale(2)")
+                    .style("cursor", null).classed("focused_region", false)
+                    .classed("focused_region_active", false);
 
         var node_bbox = card_svg.node().getBBox();
         var card_node = card.node()
