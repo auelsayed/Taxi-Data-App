@@ -7,33 +7,21 @@ app = Flask(__name__)
 
 paths = {
     2017: {
-        "pickup_count": "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\\pickup_count_2017.csv",
-        "dropoff_count": "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\\dropoff_count_2017.csv",
-        "pickup_dropoff_mapping": "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\\pickup_dropoff_mapping_2017.csv",
+        "pickup_count": "pickup_count_2017.csv",
+        "dropoff_count": "dropoff_count_2017.csv",
+        "pickup_dropoff_mapping": "pickup_dropoff_mapping_2017.csv",
     },
     2018: {
-        "pickup_count": "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\pickup_count_2018.csv",
-        "dropoff_count": "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\\dropoff_count_2018.csv",
-        "pickup_dropoff_mapping": "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\\pickup_dropoff_mapping_2018.csv",
+        "pickup_count": "pickup_count_2018.csv",
+        "dropoff_count": "dropoff_count_2018.csv",
+        "pickup_dropoff_mapping": "pickup_dropoff_mapping_2018.csv",
     },
     2019: {
-        "pickup_count": "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\\pickup_count_2019.csv",
-        "dropoff_count": "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\\dropoff_count_2019.csv",
-        "pickup_dropoff_mapping": "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\\pickup_dropoff_mapping_2019.csv",
+        "pickup_count": "pickup_count_2019.csv",
+        "dropoff_count": "dropoff_count_2019.csv",
+        "pickup_dropoff_mapping": "pickup_dropoff_mapping_2019.csv",
     },
 }
-
-# pickup_count = pd.read_csv(
-#     "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\\pickup_count_2017.csv"
-# )
-
-# dropoff_count = pd.read_csv(
-#     "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\\dropoff_count_2017.csv"
-# )
-
-# pickup_dropoff_mapping = pd.read_csv(
-#     "C:\\Users\\Abdelrahman\\Desktop\\Coding\\Python\\Taxi\\pickup_dropoff_mapping_2017.csv"
-# )
 
 
 @app.route("/")
