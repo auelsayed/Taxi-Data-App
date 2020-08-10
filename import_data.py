@@ -4,11 +4,11 @@ import pandas as pd
 from datetime import datetime
 from pprint import pprint
 
-client = Socrata("data.cityofnewyork.us", "ZTkGdN3ECjDsOsNMKtqqfqhPM")
+client = Socrata("data.cityofnewyork.us", "")
 client.timeout = 12000
 
 connection = psycopg2.connect(
-    host="localhost", database="testing", user="postgres", password="",
+    host="", database="", user="", password="",
 )
 connection.autocommit = True
 
